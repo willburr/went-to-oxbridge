@@ -1,0 +1,38 @@
+{
+  "name": "OxBridge",
+  "description": "Browser extension for helpfully informing you that someone went to OxBridge",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "icons": {
+    "16": "icon-light16.png",
+    "48": "icon-light48.png",
+    "128": "icon-light128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icon-light16.png",
+      "48": "icon-light48.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "jquery-3.6.0.min.js",
+        "compromise.min.js",
+        "content.js"
+      ],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ]
+}
