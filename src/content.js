@@ -1,23 +1,14 @@
-const infoDiv = document.createElement("div");
+const extractName = (text) => {
+  const match = /[!(:,?;"]/.exec(text)
 
-const createInfoDiv = () => {
-  infoDiv.id = 'oxbridge-overlay-div';
-  infoDiv.classList.add('info-box');
-
-  const universityTag = document.createElement('p');
-  universityTag.id = 'info-box-university-text'
-  infoDiv.appendChild(universityTag);
+  if (match) {
+    return text.slice(0, match.index).trim()
+  } else {
+    return text
+  }
 }
 
-const populateInfoDiv = (name, university) => {
-  $('#info-box-university-text').html(`went to <i>${university}</i>`);
-
-}
-
-const extractName = (person) => {
-  return person.text.replace(/[.,!"]/g, "");
-}
-
+// Creates a unique id for reference
 const createNameId = (name, i) => {
   const nameId = name.replace(/[\/#$%\^&\*;:{}=\-_"'`~()]/g, "").replace(' ', '-');
   return `${nameId.toLowerCase()}-${ i.toString()}`;
@@ -37,7 +28,7 @@ const processTag = (tag, i) => {
     if (person.terms.length < 2) {
       continue;
     }
-    const name = extractName(person);
+    const name = extractName(person.text);
     const alumniId = createNameId(name, i);
 
     tag.innerHTML = tag.innerHTML.replace(name,
@@ -77,6 +68,23 @@ const processTag = (tag, i) => {
   }
 }
 
+
+const infoDiv = document.createElement("div");
+
+const createInfoDiv = () => {
+  infoDiv.id = 'oxbridge-overlay-div';
+  infoDiv.classList.add('info-box');
+
+  const universityTag = document.createElement('p');
+  universityTag.id = 'info-box-university-text'
+  infoDiv.appendChild(universityTag);
+}
+
+const populateInfoDiv = (name, university) => {
+  $('#info-box-university-text').html(`went to <i>${university}</i>`);
+
+}
+
 const addHoverDiv = () => {
   $('body').append(infoDiv)
 }
@@ -84,7 +92,7 @@ const addHoverDiv = () => {
 const extractRelevantTags = () => {
   // Extract names from any <p> tags
   // TODO: Handle other tags
-  for (const tag of ['span', 'p', 'b', 'h1', 'h2', 'div', 'a', 'th', 'tr']) {
+  for (const tag of ['span', 'p', 'b', 'h1', 'h2', 'h3', 'div', 'a', 'th', 'tr']) {
     let i = 0;
     for (const pTag of $(tag)) {
       processTag(pTag, i)
