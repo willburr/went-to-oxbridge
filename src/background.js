@@ -20,22 +20,16 @@ const getAlmaMaterForPerson = (name) => {
   return personToAlmaMater[name];
 }
 
-// Placeholder for resolving the name
-const resolvePerson = (name) => {
-  return name;
-}
-
 chrome.runtime.onMessage.addListener(((message, sender, sendResponse) => {
   const { data, type } = message;
 
   switch (type) {
     case 'sendName':
       const { name } = data;
-      const person = resolvePerson(name);
-      const almaMater = getAlmaMaterForPerson(person);
+      const almaMater = getAlmaMaterForPerson(name);
       if (almaMater) {
         sendResponse(almaMater);
-        alumni.add(person);
+        alumni.add(name);
       } else {
         sendResponse(null)
       }

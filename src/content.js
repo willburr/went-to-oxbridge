@@ -1,6 +1,6 @@
 // Creates a unique id for reference
 const createNameId = (name, i) => {
-  const nameId = name.replace(/[\/#$%\^&\*;:{}=\-_"'`~()]/g, "").replace(' ', '-');
+  const nameId = name.replace(/[\/#$%\^&\*;:{}.,=\-_"'`~()]/g, "").replace(/ /g, '-');
   return `${nameId.toLowerCase()}-${ i.toString()}`;
 }
 
@@ -52,6 +52,8 @@ const processTag = (tag, i, names) => {
         spanElement.addEventListener('mouseout', () => {
           infoDiv.style.display = 'none';
         });
+      } else {
+        console.log(update.name);
       }
     });
   }
