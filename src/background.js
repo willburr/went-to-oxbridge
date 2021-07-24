@@ -43,6 +43,9 @@ chrome.runtime.onMessage.addListener(((message, sender, sendResponse) => {
     case 'fetchAlumni':
       sendResponse(Array.from(alumni.values(), al => {return {name: al, university: personToAlmaMater[al]}}))
       break;
+    case 'requestNames':
+      sendResponse(Object.keys(personToAlmaMater));
+      break;
     default:
       break;
   }

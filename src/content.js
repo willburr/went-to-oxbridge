@@ -1,41 +1,30 @@
-const extractName = (text) => {
-  const match = /[!(:,?;"]/.exec(text)
-
-  if (match) {
-    return text.slice(0, match.index).trim()
-  } else {
-    return text
-  }
-}
-
 // Creates a unique id for reference
 const createNameId = (name, i) => {
   const nameId = name.replace(/[\/#$%\^&\*;:{}=\-_"'`~()]/g, "").replace(' ', '-');
   return `${nameId.toLowerCase()}-${ i.toString()}`;
 }
 
-const processTag = (tag, i) => {
+const processTag = (tag, i, names) => {
   let people = [];
   $(tag).contents().each(function(index, element) {
     if(this.nodeType === 3) {
-      let doc = nlp(element.nodeValue);
-      people = people.concat(doc.people().json());
+      // Search for people
+      for (let name of names) {
+        if (element.nodeValue.indexOf(name) > -1) {
+          people.push(name);
+        }
+      }
     }
   });
   const updates = [];
   for (const person of people) {
-    // Names must be at least 2 names long
-    if (person.terms.length < 2) {
-      continue;
-    }
-    const name = extractName(person.text);
-    const alumniId = createNameId(name, i);
+    const alumniId = createNameId(person, i);
 
-    tag.innerHTML = tag.innerHTML.replace(name,
-      `<span id="${alumniId}">${name}</span>`
+    tag.innerHTML = tag.innerHTML.replace(person,
+      `<span id="${alumniId}">${person}</span>`
     )
     updates.push({
-      name: name,
+      name: person,
       alumniId: alumniId
     })
   }
@@ -82,30 +71,32 @@ const createInfoDiv = () => {
 
 const populateInfoDiv = (name, university) => {
   $('#info-box-university-text').html(`went to <i>${university}</i>`);
-
 }
 
 const addHoverDiv = () => {
   $('body').append(infoDiv)
 }
 
-const extractRelevantTags = () => {
+const extractRelevantTags = (names) => {
   // Extract names from any <p> tags
   // TODO: Handle other tags
   for (const tag of ['span', 'p', 'b', 'h1', 'h2', 'h3', 'div', 'a', 'th', 'tr']) {
     let i = 0;
     for (const pTag of $(tag)) {
-      processTag(pTag, i)
+      processTag(pTag, i, names)
       i += 1;
     }
   }
 };
 
 const onLoaded = async () => {
-  createInfoDiv();
-  addHoverDiv();
-  populateInfoDiv('William Burr', 'University of Cambridge')
-  extractRelevantTags();
+  chrome.runtime.sendMessage({
+    type: 'requestNames'
+  }, (names) => {
+    createInfoDiv();
+    addHoverDiv();
+    extractRelevantTags(names);
+  });
 }
 
 
