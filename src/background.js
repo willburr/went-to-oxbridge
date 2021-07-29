@@ -22,7 +22,6 @@ fetch('aliases.json')
       als.sort((al1, al2) => al2.length - al1.length);
       aliases.push(als);
     }
-    console.log(aliases);
     for (const [name, al] of Object.entries(nameToAliases)) {
       for (const a of al) {
         aliasToPerson[a] = name;
