@@ -13,12 +13,13 @@ class App extends React.Component<object, IState> {
         super(props);
         this.state = {
             alumni: []
-        }
-        chrome.runtime.sendMessage({
-            type: 'fetchAlumni'
-        }, alumni => {
-            this.setState({...this.state, alumni: alumni})
-        })
+        };
+        chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+            // @ts-ignore
+            chrome.tabs.sendMessage(tabs[0].id, {type: "requestSeenAlumni"}, response => {
+                this.setState({...this.state, alumni: response})
+            });
+        });
     }
 
     render() {
@@ -26,7 +27,7 @@ class App extends React.Component<object, IState> {
         return (
             <div className="App">
                 <ul>
-                    {alumni.map(alumnus => (<ul>{alumnus.name}</ul>))}
+                    {alumni.map(alumnus => (<ul>{alumnus}</ul>))}
                 </ul>
             </div>
         );

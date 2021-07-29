@@ -1,3 +1,5 @@
+const seen = new Set();
+
 // Creates a unique id for reference
 const createNameId = (name, i) => {
   const nameId = name.replace(/[\/#$%\^&\*;:{}.,=\-_"'`~()]/g, "").replace(/ /g, '-');
@@ -9,9 +11,13 @@ const processTag = (tag, i, names) => {
   $(tag).contents().each(function(index, element) {
     if(this.nodeType === 3) {
       // Search for people
-      for (let name of names) {
-        if (element.nodeValue.indexOf(name) > -1) {
-          people.push(name);
+      for (const aliases of names) {
+        for (const alias of aliases) {
+          // Select alias
+          if (element.nodeValue.indexOf(alias) > -1) {
+            people.push(alias);
+            break;
+          }
         }
       }
     }
@@ -26,7 +32,8 @@ const processTag = (tag, i, names) => {
     updates.push({
       name: person,
       alumniId: alumniId
-    })
+    });
+    seen.add(person);
   }
   for (const update of updates) {
     chrome.runtime.sendMessage({
@@ -104,3 +111,8 @@ const onLoaded = async () => {
 
 $(window).on(`load`, () => onLoaded());
 
+chrome.runtime.onMessage.addListener(
+  (request, sender, sendResponse) => {
+    if (request.type === "requestSeenAlumni")
+      sendResponse(Array.from(seen));
+  });
